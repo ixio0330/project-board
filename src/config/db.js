@@ -21,33 +21,44 @@ postgres.connect((err) => {
   }
 });
 
-async function register(login, username, password) {
+async function register(_login, _username, _password) {
   try {
     await postgres.query(
-      `insert into users (login, username, password, created_on) values('${login}', '${username}', '${password}', '${timestamp()}');`
+      `insert into users (login, username, password, created_on) values('${_login}', '${_username}', '${_password}', '${timestamp()}');`
     );
   } catch (err) {
-    console.log(`[register] ${err}`);
-  } finally {
-    // postgres.end();
+    console.log(`[db] register ${err}`);
   }
 }
 
-async function isIdExist(login) {
+async function login(_login, _password) {
   try {
     const result = await postgres.query(
-      `select login from users where login='${login}';`
+      `select login, password from users where login='${_login}'`
+    );
+    const { login, password } = result.rows[0];
+
+    if (login === _login && password === _password) return true;
+    return false;
+  } catch (err) {
+    console.log(`[db] loign ${err}`);
+  }
+}
+
+async function isIdExist(_login) {
+  try {
+    const result = await postgres.query(
+      `select login from users where login='${_login}';`
     );
     if (result.rows.length === 0) return false;
     return true;
   } catch (err) {
     return true;
-  } finally {
-    // postgres.end();
   }
 }
 
 module.exports = {
-  register,
   isIdExist,
+  register,
+  login,
 };

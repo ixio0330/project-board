@@ -1,22 +1,5 @@
 const UserStorage = require('./userStorage');
 const Response = require('./../../helper/response');
-/*
-Login
-<Request>
-URL: /api/auth-login
-Method: POST
-Body: {
-	login: id,
-	password: password
-}
-
-<Response>
-Body: {
-	isSuccess: boolean,
-	message: string,
-	data: [ token: string ]
-}
-*/
 
 class User {
   #client;
@@ -30,11 +13,11 @@ class User {
 
     try {
       const { login, password } = this.#client;
-      UserStorage.reqLogin(login, password);
-      response = new Response(true, 'Login successfully.');
+      const result = await UserStorage.reqLogin(login, password);
+      response = new Response(result.status, result.isSuccess, result.message);
     } catch (err) {
-      console.log(err);
-      response = new Response(false, 'Bad request');
+      console.log(`[user] login ${err}`);
+      response = new Response(500, false, 'Server error.');
     }
 
     return response.getResponse();
@@ -46,20 +29,7 @@ class User {
     try {
       const { login, username, password } = this.#client;
       const result = await UserStorage.reqRegister(login, username, password);
-
-      if (result.isSuccess) {
-        response = new Response(
-          result.status,
-          result.isSuccess,
-          result.message
-        );
-      } else {
-        response = new Response(
-          result.status,
-          result.isSuccess,
-          result.message
-        );
-      }
+      response = new Response(result.status, result.isSuccess, result.message);
     } catch (err) {
       console.log(`[user] register ${err}`);
       response = new Response(500, false, 'Server error.');
