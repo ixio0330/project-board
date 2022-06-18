@@ -36,9 +36,9 @@ async function login(_login, _password) {
     const result = await postgres.query(
       `select login, password from users where login='${_login}'`
     );
-    const { login, password } = result.rows[0];
+    const { password } = result.rows[0];
 
-    if (login === _login && password === _password) return true;
+    if (password === _password) return true;
     return false;
   } catch (err) {
     console.log(`[db] loign ${err}`);

@@ -8,13 +8,19 @@ class User {
     this.#client = client;
   }
 
+  getUserId() {
+    return this.#client.login;
+  }
+
   async login() {
     let response;
 
     try {
       const { login, password } = this.#client;
       const result = await UserStorage.reqLogin(login, password);
-      response = new Response(result.status, result.isSuccess, result.message);
+      response = new Response(result.status, result.isSuccess, result.message, [
+        'token',
+      ]);
     } catch (err) {
       console.log(`[user] login ${err}`);
       response = new Response(500, false, 'Server error.');
