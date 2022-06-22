@@ -63,7 +63,15 @@ class UserStorage {
       };
     }
 
-    await register(_login, _username, _password);
+    const result = await register(_login, _username, _password);
+
+    if (!result) {
+      return {
+        status: 500,
+        isSuccess: false,
+        message: 'Server error.',
+      };
+    }
 
     return {
       status: 200,

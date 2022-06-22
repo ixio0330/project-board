@@ -1,9 +1,7 @@
 const { Client } = require('pg');
 const timestamp = require('../helper/timestamp');
 require('dotenv').config();
-
-// .env 앞에 다른 이름을 붙였을 경우
-// require('dotenv').config({ path: path.join(__dirname, '/env/production.env') });
+const { cipher } = require('./cypto');
 
 const postgres = new Client({
   user: process.env.USER,
@@ -23,11 +21,14 @@ postgres.connect((err) => {
 
 async function register(_login, _username, _password) {
   try {
+    const { password, salt } = await cipher(_password);
     await postgres.query(
-      `insert into users (login, username, password, created_on) values('${_login}', '${_username}', '${_password}', '${timestamp()}');`
+      `insert into users (login, username, password, salt, created_on) values('${_login}', '${_username}', '${password}', '${salt}', '${timestamp()}');`
     );
+    return true;
   } catch (err) {
     console.log(`[db] register ${err}`);
+    return false;
   }
 }
 
