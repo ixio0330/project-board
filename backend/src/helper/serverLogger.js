@@ -1,3 +1,5 @@
+const colors = require('colors');
+
 class ServerLogger {
   static LOG = Object.freeze({
     INFO: 'INFO',
@@ -5,16 +7,20 @@ class ServerLogger {
     ERROR: 'ERROR',
   });
 
+  static space() {
+    console.log();
+  }
+
   static info(message) {
-    console.log(`[${this.LOG.INFO}] ${message}`);
+    console.log(` ${this.LOG.INFO} `.bgGreen + ` ${message}`);
   }
 
   static warn(message) {
-    console.log(`[${this.LOG.WARN}] ${message}`);
+    console.log(` ${this.LOG.WARN} `.bgYellow + ` ${message}`);
   }
 
   static error(message) {
-    console.log(`[${this.LOG.ERROR} ${message}]`);
+    console.log(` ${this.LOG.ERROR} `.bgRed + ` ${message}]`);
   }
 }
 
