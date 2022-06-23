@@ -3,6 +3,7 @@ const timestamp = require('../helper/timestamp');
 require('dotenv').config();
 const { cipher } = require('./cypto');
 const ServerLogger = require('./../helper/serverLogger');
+const { decipher } = require('./cypto');
 
 const path = 'config > db.js';
 
@@ -38,11 +39,12 @@ async function register(_login, _username, _password) {
 async function login(_login, _password) {
   try {
     const result = await postgres.query(
-      `select login, password from users where login='${_login}'`
+      `select password, salt from users where login='${_login}'`
     );
-    const { password } = result.rows[0];
+    const { password, salt } = result.rows[0];
+    const hashPassword = await decipher(_password, salt);
 
-    if (password === _password) return true;
+    if (password === hashPassword) return true;
     return false;
   } catch (err) {
     ServerLogger.error(`${path} > login function : ${err}`);
