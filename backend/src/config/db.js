@@ -2,6 +2,9 @@ const { Client } = require('pg');
 const timestamp = require('../helper/timestamp');
 require('dotenv').config();
 const { cipher } = require('./cypto');
+const ServerLogger = require('./../helper/serverLogger');
+
+const path = 'config > db.js';
 
 const postgres = new Client({
   user: process.env.USER,
@@ -13,9 +16,9 @@ const postgres = new Client({
 
 postgres.connect((err) => {
   if (err) {
-    console.log(`[connect] ${err}`);
+    ServerLogger.error(`${path}> postgres.connect : ${err}`);
   } else {
-    console.log('[connect] connected');
+    ServerLogger.info('Connected to postgres.');
   }
 });
 
@@ -27,7 +30,7 @@ async function register(_login, _username, _password) {
     );
     return true;
   } catch (err) {
-    console.log(`[db] register ${err}`);
+    ServerLogger.error(`${path} > register function : ${err}`);
     return false;
   }
 }
@@ -42,7 +45,7 @@ async function login(_login, _password) {
     if (password === _password) return true;
     return false;
   } catch (err) {
-    console.log(`[db] loign ${err}`);
+    ServerLogger.error(`${path} > login function : ${err}`);
   }
 }
 

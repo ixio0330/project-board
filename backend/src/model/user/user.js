@@ -1,5 +1,8 @@
 const UserStorage = require('./userStorage');
 const Response = require('./../../helper/response');
+const ServerLogger = require('./../../helper/serverLogger');
+
+const path = 'model > user > user.js';
 
 class User {
   #client;
@@ -22,7 +25,7 @@ class User {
         'token',
       ]);
     } catch (err) {
-      console.log(`[user] login ${err}`);
+      ServerLogger.error(`${path} > login function : ${err}`);
       response = new Response(500, false, 'Server error.');
     }
 
@@ -37,7 +40,7 @@ class User {
       const result = await UserStorage.reqRegister(login, username, password);
       response = new Response(result.status, result.isSuccess, result.message);
     } catch (err) {
-      console.log(`[user] register ${err}`);
+      ServerLogger.error(`${path} > register function : ${err}`);
       response = new Response(500, false, 'Server error.');
     }
 
