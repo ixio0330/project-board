@@ -103,7 +103,9 @@ async function getRefreshToken() {}
 async function deleteToken(_access_token) {
   try {
     // delete query 알아야 할 듯!
-    // await postgres.query(``);
+    await postgres.query(
+      `DELETE FROM tokens WHERE access_token='${_access_token}';`
+    );
     return true;
   } catch (err) {
     ServerLogger.error(`${path} > deleteToken function : ${err}`);

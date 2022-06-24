@@ -44,7 +44,7 @@ class User {
 
   static async logout(_access_token) {
     if (!_access_token) {
-      return new Response(500, false, 'Token does not exist.').getResponse();
+      return new Response(500, false, 'Token does not exist.');
     }
 
     try {
