@@ -16,12 +16,10 @@ class User {
   }
 
   async login() {
-    let response;
-
     try {
       const { login, password } = this.#client;
       const result = await UserStorage.reqLogin(login, password);
-      response = new Response(
+      return new Response(
         result.status,
         result.isSuccess,
         result.message,
@@ -29,25 +27,33 @@ class User {
       );
     } catch (err) {
       ServerLogger.error(`${path} > login function : ${err}`);
-      response = new Response(500, false, 'Server error.');
+      return new Response(500, false, 'Server error.');
     }
-
-    return response.getResponse();
   }
 
   async register() {
-    let response;
-
     try {
       const { login, username, password } = this.#client;
       const result = await UserStorage.reqRegister(login, username, password);
-      response = new Response(result.status, result.isSuccess, result.message);
+      return new Response(result.status, result.isSuccess, result.message);
     } catch (err) {
       ServerLogger.error(`${path} > register function : ${err}`);
-      response = new Response(500, false, 'Server error.');
+      return new Response(500, false, 'Server error.');
+    }
+  }
+
+  static async logout(_access_token) {
+    if (!_access_token) {
+      return new Response(500, false, 'Token does not exist.').getResponse();
     }
 
-    return response.getResponse();
+    try {
+      const result = await UserStorage.reqLogout(_access_token);
+      return new Response(result.status, result.isSuccess, result.message);
+    } catch (err) {
+      ServerLogger.error(`${path} > logout fuction : ${err}`);
+      return new Response(500, false, 'Server error.');
+    }
   }
 }
 

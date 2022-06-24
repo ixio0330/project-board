@@ -72,8 +72,15 @@ async function isIdExist(_login) {
   }
 }
 
-async function logout() {
+async function logout(_access_token) {
   // token 삭제
+  try {
+    deleteToken(_access_token);
+    return true;
+  } catch (err) {
+    ServerLogger.error(`${path} > logout function : ${err}`);
+    return false;
+  }
 }
 
 // token
@@ -93,8 +100,20 @@ async function getAccessToken() {}
 
 async function getRefreshToken() {}
 
+async function deleteToken(_access_token) {
+  try {
+    // delete query 알아야 할 듯!
+    // await postgres.query(``);
+    return true;
+  } catch (err) {
+    ServerLogger.error(`${path} > deleteToken function : ${err}`);
+    return false;
+  }
+}
+
 module.exports = {
   isIdExist,
   register,
   login,
+  logout,
 };

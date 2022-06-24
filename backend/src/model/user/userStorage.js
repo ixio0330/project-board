@@ -1,4 +1,4 @@
-const { register, isIdExist, login } = require('../../config/db');
+const { register, isIdExist, login, logout } = require('../../config/db');
 const { isString } = require('../../helper/validation');
 
 class UserStorage {
@@ -83,6 +83,23 @@ class UserStorage {
       status: 200,
       isSuccess: true,
       message: 'User created successfully.',
+    };
+  }
+
+  static async reqLogout(_access_token) {
+    const reulst = logout(_access_token);
+    if (!reulst) {
+      return {
+        status: 400,
+        isSuccess: false,
+        message: 'Not logged in.',
+      };
+    }
+
+    return {
+      status: 200,
+      isSuccess: true,
+      message: 'Logout successfully.',
     };
   }
 }
