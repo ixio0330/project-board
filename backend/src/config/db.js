@@ -2,8 +2,10 @@ const { Client } = require('pg');
 const timestamp = require('../helper/timestamp');
 require('dotenv').config();
 const { cipher } = require('./cypto');
-const ServerLogger = require('./../helper/serverLogger');
 const { decipher } = require('./cypto');
+
+const ServerLogger = require('./../helper/serverLogger');
+const { makeToken } = require('./token');
 
 const path = 'config > db.js';
 
@@ -23,6 +25,7 @@ postgres.connect((err) => {
   }
 });
 
+// auth
 async function register(_login, _username, _password) {
   try {
     const { password, salt } = await cipher(_password);
@@ -39,12 +42,18 @@ async function register(_login, _username, _password) {
 async function login(_login, _password) {
   try {
     const result = await postgres.query(
-      `select password, salt from users where login='${_login}'`
+      `select id, password, salt from users where login='${_login}'`
     );
-    const { password, salt } = result.rows[0];
+    const { id, password, salt } = result.rows[0];
     const hashPassword = await decipher(_password, salt);
 
-    if (password === hashPassword) return true;
+    if (password === hashPassword) {
+      const { accessToken, refreshToken } = makeToken(_login);
+      return saveToken(id, accessToken, refreshToken)
+        ? { accessToken, refreshToken }
+        : false;
+    }
+
     return false;
   } catch (err) {
     ServerLogger.error(`${path} > login function : ${err}`);
@@ -62,6 +71,27 @@ async function isIdExist(_login) {
     return true;
   }
 }
+
+async function logout() {
+  // token 삭제
+}
+
+// token
+async function saveToken(_user_id, _access_token, _refresh_token) {
+  try {
+    await postgres.query(
+      `insert into tokens (user_id, access_token, refresh_token) values('${_user_id}', '${_access_token}', '${_refresh_token}');`
+    );
+    return true;
+  } catch (err) {
+    ServerLogger.error(`${path} > saveToken function : ${err}`);
+    return false;
+  }
+}
+
+async function getAccessToken() {}
+
+async function getRefreshToken() {}
 
 module.exports = {
   isIdExist,

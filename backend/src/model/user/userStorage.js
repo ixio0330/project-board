@@ -1,5 +1,5 @@
 const { register, isIdExist, login } = require('../../config/db');
-const { string } = require('../../helper/validation');
+const { isString } = require('../../helper/validation');
 
 class UserStorage {
   constructor() {}
@@ -7,7 +7,7 @@ class UserStorage {
   // login 요청
   static async reqLogin(_login, _password) {
     // 1. login, username valid check
-    if (!string(_login)) {
+    if (!isString(_login)) {
       return {
         status: 400,
         isSuccess: false,
@@ -27,25 +27,31 @@ class UserStorage {
 
     // 3. log in successfully?
     const result = await login(_login, _password);
-    if (result) {
-      return {
-        status: 200,
-        isSuccess: true,
-        message: 'Login successfully.',
-      };
-    } else {
+    if (!result) {
       return {
         status: 400,
         isSuccess: false,
         message: 'Login failed.',
       };
     }
+
+    return {
+      status: 200,
+      isSuccess: true,
+      message: 'Login successfully.',
+      data: [
+        {
+          accessToken: result.accessToken,
+          refreshToken: result.refreshToken,
+        },
+      ],
+    };
   }
 
   // register 요청
   static async reqRegister(_login, _username, _password) {
     // 1. login, username valid check
-    if (!string(_login) && !string(_username)) {
+    if (!isString(_login) && !isString(_username)) {
       return {
         status: 400,
         isSuccess: false,

@@ -21,9 +21,12 @@ class User {
     try {
       const { login, password } = this.#client;
       const result = await UserStorage.reqLogin(login, password);
-      response = new Response(result.status, result.isSuccess, result.message, [
-        'token',
-      ]);
+      response = new Response(
+        result.status,
+        result.isSuccess,
+        result.message,
+        result.data
+      );
     } catch (err) {
       ServerLogger.error(`${path} > login function : ${err}`);
       response = new Response(500, false, 'Server error.');
