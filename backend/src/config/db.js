@@ -44,6 +44,7 @@ async function login(_login, _password) {
     const result = await postgres.query(
       `select id, password, salt from users where login='${_login}'`
     );
+
     const { id, password, salt } = result.rows[0];
     const hashPassword = await decipher(_password, salt);
 
@@ -96,7 +97,28 @@ async function saveToken(_user_id, _access_token, _refresh_token) {
   }
 }
 
-async function getAccessToken() {}
+async function isTokenExist(_login) {
+  try {
+    const userId = await postgres.query(
+      `select id from users where login='${_login}'`
+    );
+    const user_id = userId.rows[0].id;
+
+    const result = await postgres.query(
+      `select id from tokens where user_id='${user_id}'`
+    );
+
+    if (result.rowCount > 0) {
+      return true;
+    }
+    return false;
+  } catch (err) {
+    ServerLogger.error(`${path} > isTokenExist function : ${err}`);
+    return false;
+  }
+}
+
+async function setAccessToken() {}
 
 async function getRefreshToken() {}
 
@@ -115,6 +137,7 @@ async function deleteToken(_access_token) {
 
 module.exports = {
   isIdExist,
+  isTokenExist,
   register,
   login,
   logout,

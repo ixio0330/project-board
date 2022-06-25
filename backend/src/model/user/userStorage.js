@@ -1,4 +1,10 @@
-const { register, isIdExist, login, logout } = require('../../config/db');
+const {
+  register,
+  isIdExist,
+  login,
+  logout,
+  isTokenExist,
+} = require('../../config/db');
 const { isString } = require('../../helper/validation');
 
 class UserStorage {
@@ -16,8 +22,8 @@ class UserStorage {
     }
 
     // 2. id exist check
-    const isExist = await isIdExist(_login);
-    if (!isExist) {
+    const isExistId = await isIdExist(_login);
+    if (!isExistId) {
       return {
         status: 400,
         isSuccess: false,
@@ -25,7 +31,17 @@ class UserStorage {
       };
     }
 
-    // 3. log in successfully?
+    // 3. token exist check
+    const isExistToken = await isTokenExist(_login);
+    if (isExistToken) {
+      return {
+        status: 400,
+        isSuccess: false,
+        message: 'Already logged in.',
+      };
+    }
+
+    // 4. login
     const result = await login(_login, _password);
     if (!result) {
       return {
