@@ -1,8 +1,7 @@
 const { Client } = require('pg');
 const timestamp = require('../helper/timestamp');
 require('dotenv').config();
-const { cipher } = require('./cypto');
-const { decipher } = require('./cypto');
+const { cipher, decipher } = require('./cypto');
 
 const ServerLogger = require('./../helper/serverLogger');
 const { makeToken } = require('./token');
@@ -118,15 +117,33 @@ async function isTokenExist(_login) {
   }
 }
 
-async function setAccessToken() {}
+async function setAccessToken(_token_id, _new_access_token) {
+  try {
+    await postgres.query(`
+    update tokens set access_token='${_new_access_token}' where id='${_token_id}';`);
+    return true;
+  } catch (err) {
+    ServerLogger.error(`${path} > setAccessToken function : ${err}`);
+    return false;
+  }
+}
 
-async function getRefreshToken() {}
+async function getRefreshToken(_refresh_token) {
+  try {
+    const result = await postgres.query(
+      `select id, refresh_token from tokens where refresh_token='${_refresh_token}';`
+    );
+    return result.rows[0];
+  } catch (err) {
+    ServerLogger.error(`${path} > getRefreshToken function : ${err}`);
+    return false;
+  }
+}
 
 async function deleteToken(_access_token) {
   try {
-    // delete query 알아야 할 듯!
     await postgres.query(
-      `DELETE FROM tokens WHERE access_token='${_access_token}';`
+      `delete from tokens where access_token='${_access_token}';`
     );
     return true;
   } catch (err) {

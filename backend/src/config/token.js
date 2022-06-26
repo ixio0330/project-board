@@ -48,4 +48,6 @@ const checkToken = (_token) => {
   }
 };
 
+// 토큰이 유효한지 체크 -> accessToken이 만료되었다면 refreshToken을 받아서 db에서 찾아서 확인하고 refreshToken이 정상적이라면 accessToken을 재발급해준다.
+
 module.exports = { makeToken, checkToken };
