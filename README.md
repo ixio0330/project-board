@@ -9,7 +9,7 @@
 
 ## 최종 목표
 
-OCI(Oracle Cloud Infra)로 Ubuntu 기반 서버에서 nginx를 사용해서 배포 할 예정입니다.
+OCI(Oracle Cloud Infrastructure)로 Ubuntu 기반 서버에서 nginx를 사용해서 배포 할 예정입니다.
 
 ### Backend
 
