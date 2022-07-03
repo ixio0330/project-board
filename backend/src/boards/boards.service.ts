@@ -2,17 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { Board } from './entities/board.entity';
-import { v1 as uuid } from 'uuid';
 import { getTodayTimestamp } from '../helper/timestamp';
 
 @Injectable()
 export class BoardsService {
-  private boards = [];
+  private boards: Board[] = [];
+  private board_id: number = 0;
 
   create(createBoardDto: CreateBoardDto): Board {
     const { user_id, title, content, status } = createBoardDto;
     const board: Board = {
-      id: uuid,
+      id: this.board_id,
       user_id,
       title,
       content,
@@ -21,23 +21,43 @@ export class BoardsService {
       updated_on: null,
     };
     this.boards.push(board);
+    this.board_id++;
 
     return board;
   }
 
-  findAll() {
-    return `This action returns all boards`;
+  findAll(): Board[] {
+    return this.boards;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} board`;
+  findOne(id: number): Board {
+    return this.boards.find((board) => board.id === id);
   }
 
-  update(id: number, updateBoardDto: UpdateBoardDto) {
-    return `This action updates a #${id} board`;
+  update(id: number, updateBoardDto: UpdateBoardDto): Board | boolean {
+    try {
+      const { user_id, title, content, status } = updateBoardDto;
+      const updateBoard = this.findOne(id);
+
+      if (user_id !== updateBoard.user_id) return false;
+
+      const board = {
+        ...updateBoard,
+        title,
+        content,
+        status,
+      };
+
+      this.boards = [...this.boards, board];
+
+      return board;
+    } catch (err) {
+      return false;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} board`;
+  remove(id: number): Board[] {
+    this.boards = this.boards.filter((board) => board.id !== id);
+    return this.boards;
   }
 }

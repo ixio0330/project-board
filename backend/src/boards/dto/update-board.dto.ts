@@ -3,7 +3,8 @@ import { CreateBoardDto } from './create-board.dto';
 import { BoardStatus } from '../entities/board.entity';
 
 export class UpdateBoardDto extends PartialType(CreateBoardDto) {
-  title?: string;
-  content?: string;
-  status?: BoardStatus;
+  user_id: string;
+  title: string;
+  content: string;
+  status: BoardStatus;
 }
