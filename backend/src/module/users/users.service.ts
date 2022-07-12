@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { getTodayTimestamp } from '../helper/timestamp';
-import { MailService } from 'src/mail/mail.service';
+import { getTodayTimestamp } from '../../helper/timestamp';
+import { MailService } from 'src/module/mail/mail.service';
 import * as uuid from 'uuid';
 
 @Injectable()

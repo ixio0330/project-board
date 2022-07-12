@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { auth, mailBaseUrl } from '../../.env/env';
+import { auth, mailBaseUrl } from '../../../.env/env';
 import Mail = require('nodemailer/lib/mailer');
 import * as nodemailer from 'nodemailer';
 
