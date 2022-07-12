@@ -31,15 +31,18 @@ export class BoardsService {
   }
 
   findOne(id: number): Board {
-    return this.boards.find((board) => board.id === id);
+    const found = this.boards.find((board) => board.id === id);
+    return found ?? null;
   }
 
-  update(id: number, updateBoardDto: UpdateBoardDto): Board | boolean {
+  update(id: number, updateBoardDto: UpdateBoardDto): Board | null {
     try {
       const { user_id, title, content, status } = updateBoardDto;
       const updateBoard = this.findOne(id);
 
-      if (user_id !== updateBoard.user_id) return false;
+      if (!updateBoard) return null;
+
+      if (user_id !== updateBoard.user_id) return null;
 
       const board = {
         ...updateBoard,
@@ -52,11 +55,14 @@ export class BoardsService {
 
       return board;
     } catch (err) {
-      return false;
+      return null;
     }
   }
 
   remove(id: number): Board[] {
+    const found = this.findOne(id);
+    if (!found) return null;
+
     this.boards = this.boards.filter((board) => board.id !== id);
     return this.boards;
   }
