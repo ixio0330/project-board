@@ -36,10 +36,6 @@ export class UsersController {
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
-    const user = this.usersService.findOne(+id);
-    if (!user) {
-      throw new NotFoundException(`User with ${id} not found.`);
-    }
     return this.usersService.findOne(+id);
   }
 

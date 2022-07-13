@@ -22,6 +22,7 @@ export class UsersService {
 
   constructor(private readonly mailService: MailService) {}
 
+  // 가입
   async regist(createUserDto: CreateUserDto): Promise<number> {
     // 사용자 정보 초기화
     this.user = { ...this.initUser };
@@ -40,6 +41,7 @@ export class UsersService {
     );
   }
 
+  // 생성
   async create(authNumber: number) {
     // 인증번호 확인
     this.mailService.verifyAuthNumber(authNumber);
@@ -56,6 +58,7 @@ export class UsersService {
     return this.user;
   }
 
+  // 수정
   update(id: number, updateUserDto: UpdateUserDto): User {
     const updateUser = this.findOne(id);
     const user = {
@@ -67,31 +70,36 @@ export class UsersService {
     return user;
   }
 
+  // 삭제
   remove(id: number): User[] {
-    if (!this.findOne(id)) {
-      throw new BadRequestException('사용자가 존재하지 않습니다.');
-    }
+    this.findOne(id);
     this.users = this.users.filter((user) => user.id !== id);
     return this.users;
   }
 
+  // 전체 조회
   findAll(): User[] {
     return this.users;
   }
 
+  // 특정 조회
   findOne(id: number): User {
-    return this.users.find((user) => user.id === id);
+    const found = this.users.find((user) => user.id === id);
+    if (!found) {
+      throw new BadRequestException('존재하지 않는 사용자입니다.');
+    }
+    return found;
   }
 
+  // 중복 체크
   userExistCheck(email: string) {
     if (this.users.find((user) => user.email === email)) {
       throw new BadRequestException('이미 존재하는 사용자입니다.');
     }
-    return;
   }
 
+  // 추가
   saveUser(user: User) {
     this.users.push(user);
-    return true;
   }
 }
