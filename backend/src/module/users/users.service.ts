@@ -1,10 +1,20 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User, UserRole } from './entities/user.entity';
+import { User } from './entities/user.entity';
 import { getTodayTimestamp } from '../../helper/timestamp';
 import { MailService } from 'src/module/mail/mail.service';
 import * as uuid from 'uuid';
+import { UserRoleEntity } from './entities/user.role.entity';
+
+/**
+ * TODO 사용자 비밀번호 암호화
+ * TODO 로그인 로직 구현
+ * TODO 세션? 토큰? -> 정해야 함
+ * TODO 사용자 탈퇴 (비밀번호 확인)
+ * TODO 사용자 아이디 찾기 (이메일)
+ * TODO 사용자 비밀번호 찾기 (이메일)
+ */
 
 @Injectable()
 export class UsersService {
@@ -15,7 +25,7 @@ export class UsersService {
     authenticationStatus: false,
     email: '',
     id: this.id,
-    role: 'user',
+    role: UserRoleEntity.user,
     password: '',
     uesrName: '',
     userId: '',
@@ -98,7 +108,7 @@ export class UsersService {
 
   // 관리자 체크
   adminExistCheck() {
-    if (this.users.find((user) => user.role === 'admin')) {
+    if (this.users.find((user) => user.role === UserRoleEntity.admin)) {
       throw new BadRequestException('이미 관리자가 존재합니다.');
     }
     return;

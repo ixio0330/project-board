@@ -1,8 +1,8 @@
-export type UserRole = 'admin' | 'user';
+import { UserRoleEntity } from './user.role.entity';
 
 export class User {
   id: number;
-  role: UserRole;
+  role: UserRoleEntity;
   authenticationStatus: boolean;
   userId: string;
   uesrName: string;
