@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
 import { getTodayTimestamp } from '../../helper/timestamp';
 import { MailService } from 'src/module/mail/mail.service';
 import * as uuid from 'uuid';
@@ -15,6 +15,7 @@ export class UsersService {
     authenticationStatus: false,
     email: '',
     id: this.id,
+    role: 'user',
     password: '',
     uesrName: '',
     userId: '',
@@ -28,6 +29,10 @@ export class UsersService {
     this.user = { ...this.initUser };
     // 사용자 중복 체크
     this.userExistCheck(createUserDto.email);
+    // 관리자일 경우 체크
+    if (createUserDto.role === 'admin') {
+      this.adminExistCheck();
+    }
     // 사용자 정보 저장 (아이디, 생성날짜, 미인증 상태 추가)
     this.user = {
       ...createUserDto,
@@ -89,6 +94,14 @@ export class UsersService {
       throw new BadRequestException('존재하지 않는 사용자입니다.');
     }
     return found;
+  }
+
+  // 관리자 체크
+  adminExistCheck() {
+    if (this.users.find((user) => user.role === 'admin')) {
+      throw new BadRequestException('이미 관리자가 존재합니다.');
+    }
+    return;
   }
 
   // 중복 체크

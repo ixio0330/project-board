@@ -1,5 +1,8 @@
+export type UserRole = 'admin' | 'user';
+
 export class User {
   id: number;
+  role: UserRole;
   authenticationStatus: boolean;
   userId: string;
   uesrName: string;
