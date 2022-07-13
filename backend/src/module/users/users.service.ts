@@ -68,7 +68,11 @@ export class UsersService {
   }
 
   remove(id: number): User[] {
-    return this.users.filter((user) => user.id !== id);
+    if (!this.findOne(id)) {
+      throw new BadRequestException('사용자가 존재하지 않습니다.');
+    }
+    this.users = this.users.filter((user) => user.id !== id);
+    return this.users;
   }
 
   findAll(): User[] {
