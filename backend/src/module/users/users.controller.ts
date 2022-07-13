@@ -20,8 +20,13 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  resgist(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.regist(createUserDto);
+  }
+
+  @Post(':authNumber')
+  create(@Param('authNumber', ParseIntPipe) authNumber: number) {
+    return this.usersService.create(authNumber);
   }
 
   @Get()

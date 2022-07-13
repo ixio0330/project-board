@@ -1,7 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { auth, mailBaseUrl } from '../../../.env/env';
 import Mail = require('nodemailer/lib/mailer');
 import * as nodemailer from 'nodemailer';
+import { getRandomNumber } from 'src/helper/randomNumber';
 
 interface EmailOptions {
   to: string;
@@ -12,6 +17,7 @@ interface EmailOptions {
 @Injectable()
 export class MailService {
   private transporter: Mail;
+  private authNumber = 0;
 
   constructor() {
     this.transporter = nodemailer.createTransport({
@@ -20,9 +26,16 @@ export class MailService {
     });
   }
 
+  verifyAuthNumber(authNumber: number) {
+    if (authNumber !== this.authNumber) {
+      throw new BadRequestException('인증번호가 올바르지 않습니다.');
+    }
+    return;
+  }
+
   async sendVerificationMail(emailAddress: string, singupToken: string) {
     const url = `${mailBaseUrl}/users/email-verify?signupVerifyToken=${singupToken}`;
-    const authNumber = Math.floor(Math.random() * 10000);
+    this.authNumber = getRandomNumber();
 
     const mailOptions: EmailOptions = {
       to: emailAddress,
@@ -30,25 +43,20 @@ export class MailService {
       html: `
         아래 숫자를 입력하면 가입 인증이 완료됩니다.<br/>
         <form action="${url}" method="POST">
-          ${authNumber}
+          ${this.authNumber}
         </form>
       `,
     };
 
-    const response = {
-      data: null,
-      error: null,
-      authNumber,
-    };
-
     try {
-      const res = await this.transporter.sendMail(mailOptions);
-      response.data = res;
+      await this.transporter.sendMail(mailOptions);
     } catch (err) {
-      response.error = err;
-    } finally {
-      this.transporter.close();
-      return response;
+      console.log(err);
+      throw new InternalServerErrorException(
+        '이메일 발송중 오류가 발생했습니다.',
+      );
     }
+    this.transporter.close();
+    return this.authNumber;
   }
 }
