@@ -7,9 +7,12 @@ import { MailService } from 'src/module/mail/mail.service';
 import * as uuid from 'uuid';
 import { UserRoleEntity } from './entities/user.role.entity';
 import { PasswordService } from '../password/password.service';
+import { ResponseService } from '../response/response.service';
+import { ResponseUserDto } from './dto/response-user.dto';
 
 /**
- * TODO 관리자/사용자 반환 값 처리 다르게 하기
+ * TODO 커스텀 파이프 만들어서 유효성 검증하기
+ * TODO 관리자 체크 (세션 구현하고 나서)
  * TODO 로그인 로직 구현
  * TODO 세션? 토큰? -> 정해야 함
  * TODO 사용자 탈퇴 (비밀번호 확인)
@@ -35,6 +38,7 @@ export class UsersService {
   constructor(
     private readonly mailService: MailService,
     private readonly passwordService: PasswordService,
+    private readonly responseSerivce: ResponseService,
   ) {}
 
   // 가입
@@ -43,7 +47,6 @@ export class UsersService {
     this.user = { ...this.initUser };
     // 사용자 중복 체크
     this.userExistCheck(createUserDto.email);
-    console.log(createUserDto);
     // 관리자일 경우 체크
     if (createUserDto.role === UserRoleEntity.admin) {
       this.adminExistCheck();
@@ -79,7 +82,18 @@ export class UsersService {
     this.saveUser(this.user);
     // id 증가
     this.id++;
-    return this.user;
+
+    const responseUserData: ResponseUserDto = {
+      email: this.user.email,
+      role: this.user.role,
+      uesrName: this.user.uesrName,
+      userId: this.user.userId,
+    };
+
+    return this.responseSerivce.sendResponse({
+      message: '회원가입에 성공했습니다.',
+      data: responseUserData,
+    });
   }
 
   // 수정
@@ -115,12 +129,18 @@ export class UsersService {
     return found;
   }
 
-  // 관리자 체크
+  isAdmin(id: number) {
+    const found = this.users.find((user) => user.id === id);
+    if (found.role !== UserRoleEntity.admin) {
+      throw new BadRequestException('관리자가 아닙니다.');
+    }
+  }
+
+  // 관리자 체크 (세션으로 해야 함)
   adminExistCheck() {
     if (this.users.find((user) => user.role === UserRoleEntity.admin)) {
       throw new BadRequestException('이미 관리자가 존재합니다.');
     }
-    return;
   }
 
   // 중복 체크
