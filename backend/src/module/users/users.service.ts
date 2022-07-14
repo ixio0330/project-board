@@ -6,9 +6,10 @@ import { getTodayTimestamp } from '../../helper/timestamp';
 import { MailService } from 'src/module/mail/mail.service';
 import * as uuid from 'uuid';
 import { UserRoleEntity } from './entities/user.role.entity';
+import { PasswordService } from '../password/password.service';
 
 /**
- * TODO 사용자 비밀번호 암호화
+ * TODO 관리자/사용자 반환 값 처리 다르게 하기
  * TODO 로그인 로직 구현
  * TODO 세션? 토큰? -> 정해야 함
  * TODO 사용자 탈퇴 (비밀번호 확인)
@@ -22,16 +23,19 @@ export class UsersService {
   private id = 0;
   private user = {} as User;
   private initUser: User = {
-    authenticationStatus: false,
     email: '',
     id: this.id,
     role: UserRoleEntity.user,
     password: '',
     uesrName: '',
     userId: '',
+    salt: '',
   };
 
-  constructor(private readonly mailService: MailService) {}
+  constructor(
+    private readonly mailService: MailService,
+    private readonly passwordService: PasswordService,
+  ) {}
 
   // 가입
   async regist(createUserDto: CreateUserDto): Promise<number> {
@@ -39,15 +43,21 @@ export class UsersService {
     this.user = { ...this.initUser };
     // 사용자 중복 체크
     this.userExistCheck(createUserDto.email);
+    console.log(createUserDto);
     // 관리자일 경우 체크
-    if (createUserDto.role === 'admin') {
+    if (createUserDto.role === UserRoleEntity.admin) {
       this.adminExistCheck();
     }
-    // 사용자 정보 저장 (아이디, 생성날짜, 미인증 상태 추가)
+    // 비밀번호 암호화
+    const { password, salt } = await this.passwordService.cipher(
+      createUserDto.password,
+    );
+    // 사용자 정보 저장 (아이디, 생성날짜)
     this.user = {
       ...createUserDto,
+      password,
+      salt,
       id: 0,
-      authenticationStatus: false,
     };
     // 가입인증 이메일 발송
     return await this.mailService.sendVerificationMail(
@@ -60,11 +70,10 @@ export class UsersService {
   async create(authNumber: number) {
     // 인증번호 확인
     this.mailService.verifyAuthNumber(authNumber);
-    // 사용자 정보 저장 (생성 날짜, 인증 상태 추가)
+    // 사용자 정보 저장 (생성 날짜)
     this.user = {
       ...this.user,
       created_on: getTodayTimestamp(),
-      authenticationStatus: true,
     };
     // 사용자 추가
     this.saveUser(this.user);
