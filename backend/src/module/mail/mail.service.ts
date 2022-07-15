@@ -6,7 +6,7 @@ import {
 import { auth, mailBaseUrl } from '../../../.env/env';
 import Mail = require('nodemailer/lib/mailer');
 import * as nodemailer from 'nodemailer';
-import { getRandomNumber } from 'src/helper/randomNumber';
+import { getRandomNumber } from '../../helper/randomNumber';
 
 interface EmailOptions {
   to: string;
@@ -49,7 +49,8 @@ export class MailService {
     };
 
     try {
-      await this.transporter.sendMail(mailOptions);
+      // 이메일 보내는 비용으로 인해 주석처리
+      // await this.transporter.sendMail(mailOptions);
     } catch (err) {
       console.log(err);
       throw new InternalServerErrorException(

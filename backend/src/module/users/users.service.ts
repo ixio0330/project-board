@@ -3,22 +3,17 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { getTodayTimestamp } from '../../helper/timestamp';
-import { MailService } from 'src/module/mail/mail.service';
+import { MailService } from '../mail/mail.service';
 import * as uuid from 'uuid';
-import { UserRoleEntity } from './entities/user.role.entity';
+import { EnumUserRole } from './entities/user.role.entity';
 import { PasswordService } from '../password/password.service';
 import { ResponseService } from '../response/response.service';
 import { ResponseUserDto } from './dto/response-user.dto';
-
-/**
- * TODO 커스텀 파이프 만들어서 유효성 검증하기
- * TODO 관리자 체크 (세션 구현하고 나서)
- * TODO 로그인 로직 구현
- * TODO 세션? 토큰? -> 정해야 함
- * TODO 사용자 탈퇴 (비밀번호 확인)
- * TODO 사용자 아이디 찾기 (이메일)
- * TODO 사용자 비밀번호 찾기 (이메일)
- */
+enum EnumUserUnique {
+  eamil = '이메일',
+  userId = '사용자 아이디',
+  userName = '사용자 닉네임',
+}
 
 @Injectable()
 export class UsersService {
@@ -28,7 +23,7 @@ export class UsersService {
   private initUser: User = {
     email: '',
     id: this.id,
-    role: UserRoleEntity.user,
+    role: EnumUserRole.user,
     password: '',
     uesrName: '',
     userId: '',
@@ -45,10 +40,14 @@ export class UsersService {
   async regist(createUserDto: CreateUserDto): Promise<number> {
     // 사용자 정보 초기화
     this.user = { ...this.initUser };
-    // 사용자 중복 체크
-    this.userExistCheck(createUserDto.email);
+    // 이메일 중복 체크
+    this.userExistCheck(EnumUserUnique.eamil, createUserDto.email);
+    // 아이디 중복 체크
+    this.userExistCheck(EnumUserUnique.userId, createUserDto.userId);
+    // 닉네임 중복 체크
+    this.userExistCheck(EnumUserUnique.userName, createUserDto.uesrName);
     // 관리자일 경우 체크
-    if (createUserDto.role === UserRoleEntity.admin) {
+    if (createUserDto.role === EnumUserRole.admin) {
       this.adminExistCheck();
     }
     // 비밀번호 암호화
@@ -129,24 +128,27 @@ export class UsersService {
     return found;
   }
 
+  // 관리자 체크
   isAdmin(id: number) {
     const found = this.users.find((user) => user.id === id);
-    if (found.role !== UserRoleEntity.admin) {
+    if (found.role !== EnumUserRole.admin) {
       throw new BadRequestException('관리자가 아닙니다.');
     }
   }
 
-  // 관리자 체크 (세션으로 해야 함)
+  // 관리자 중복 체크
   adminExistCheck() {
-    if (this.users.find((user) => user.role === UserRoleEntity.admin)) {
+    const found = this.users.find((user) => user.role === EnumUserRole.admin);
+    if (found) {
       throw new BadRequestException('이미 관리자가 존재합니다.');
     }
   }
 
   // 중복 체크
-  userExistCheck(email: string) {
-    if (this.users.find((user) => user.email === email)) {
-      throw new BadRequestException('이미 존재하는 사용자입니다.');
+  userExistCheck(type: EnumUserUnique, value: string) {
+    const found = this.users.find((user) => user[type] === value);
+    if (found) {
+      throw new BadRequestException(`이미 존재하는 ${type}입니다.`);
     }
   }
 

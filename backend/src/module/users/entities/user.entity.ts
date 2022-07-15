@@ -1,4 +1,4 @@
-import { UserRoleEntity } from './user.role.entity';
+import { EnumUserRole } from './user.role.entity';
 
 export class User {
   id: number;
@@ -6,7 +6,7 @@ export class User {
   uesrName: string;
   email: string;
   password: string;
-  role: UserRoleEntity;
+  role: EnumUserRole;
   salt: string;
   created_on?: string;
   updated_on?: string;

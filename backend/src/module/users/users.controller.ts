@@ -8,19 +8,19 @@ import {
   Delete,
   UsePipes,
   ParseIntPipe,
-  NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { IsNotEmpty, IsEmail } from 'class-validator';
+import { CreateUserValidatoinPipe } from './pipes/create-user-validation.pipe';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  resgist(@Body() createUserDto: CreateUserDto) {
+  @UsePipes()
+  resgist(@Body(CreateUserValidatoinPipe) createUserDto: CreateUserDto) {
     return this.usersService.regist(createUserDto);
   }
 

@@ -1,4 +1,4 @@
-export enum UserRoleEntity {
+export enum EnumUserRole {
   admin = 'admin',
   user = 'user',
 }
