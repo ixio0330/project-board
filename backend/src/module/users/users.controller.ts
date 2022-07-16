@@ -12,7 +12,6 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CreateUserValidatoinPipe } from './pipes/create-user-validation.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -20,7 +19,7 @@ export class UsersController {
 
   @Post()
   @UsePipes()
-  resgist(@Body(CreateUserValidatoinPipe) createUserDto: CreateUserDto) {
+  resgist(@Body() createUserDto: CreateUserDto) {
     return this.usersService.regist(createUserDto);
   }
 
