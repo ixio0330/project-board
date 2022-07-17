@@ -4,11 +4,11 @@ import { EnumUserRole } from '../entities/user.role.entity';
 export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
-  readonly userId: string;
+  readonly id: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly uesrName: string;
+  readonly nickname: string;
 
   @IsNotEmpty()
   @IsEmail()

@@ -3,7 +3,7 @@ const crypto = require('crypto');
 
 @Injectable()
 export class PasswordService {
-  createSalt(): Promise<string> {
+  private createSalt(): Promise<string> {
     return new Promise((resolve, reject) => {
       crypto.randomBytes(64, (err: any, buf: any) => {
         if (err) buf(err);

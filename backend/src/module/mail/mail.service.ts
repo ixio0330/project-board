@@ -53,9 +53,7 @@ export class MailService {
       // await this.transporter.sendMail(mailOptions);
     } catch (err) {
       console.log(err);
-      throw new InternalServerErrorException(
-        '이메일 발송중 오류가 발생했습니다.',
-      );
+      throw new InternalServerErrorException();
     }
     this.transporter.close();
     return this.authNumber;
