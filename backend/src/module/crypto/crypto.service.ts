@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 const crypto = require('crypto');
 
 @Injectable()
-export class PasswordService {
+export class CryptoService {
   private createSalt(): Promise<string> {
     return new Promise((resolve, reject) => {
       crypto.randomBytes(64, (err: any, buf: any) => {

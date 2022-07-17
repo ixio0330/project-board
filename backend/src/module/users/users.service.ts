@@ -6,7 +6,8 @@ import { getTodayTimestamp } from '../../helper/timestamp';
 import { MailService } from '../mail/mail.service';
 import * as uuid from 'uuid';
 import { EnumUserRole } from './entities/user.role.entity';
-import { PasswordService } from '../password/password.service';
+import { CryptoService } from '../crypto/crypto.service';
+import { LoginDto } from '../auth/dto/login.dto';
 
 enum EnumUserUnique {
   eamil = '이메일',
@@ -20,7 +21,7 @@ export class UsersService {
 
   constructor(
     private readonly mailService: MailService,
-    private readonly passwordService: PasswordService,
+    private readonly cryptoService: CryptoService,
   ) {}
 
   // 생성
@@ -36,7 +37,7 @@ export class UsersService {
       this.adminExistCheck();
     }
     // 비밀번호 암호화
-    const { password, salt } = await this.passwordService.cipher(
+    const { password, salt } = await this.cryptoService.cipher(
       createUserDto.password,
     );
 
@@ -73,6 +74,19 @@ export class UsersService {
     this.findById(id);
     this.users = this.users.filter((user) => user.id !== id);
     return this.users;
+  }
+
+  async verifyPassword(loginDto: LoginDto) {
+    const user = this.findById(loginDto.id);
+    const hashPassword = await this.cryptoService.decipher(
+      loginDto.password,
+      user.salt,
+    );
+    if (hashPassword !== user.password) {
+      throw new BadRequestException('잘못된 인증 정보입니다.');
+    }
+
+    return user;
   }
 
   // 전체 조회

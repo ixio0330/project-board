@@ -4,7 +4,6 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { tokenInfo } from '../../../.env/env';
-import { PasswordService } from '../password/password.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { EnumUserRole } from '../users/entities/user.role.entity';
 import { UsersService } from '../users/users.service';
@@ -20,24 +19,28 @@ interface TokenUserInfo {
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly passwordService: PasswordService,
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
   private tokenInfo = tokenInfo;
 
   async login(loginDto: LoginDto) {
-    const user = this.usersService.findById(loginDto.id);
-    const hashPassword = await this.passwordService.decipher(
-      user.password,
-      user.salt,
-    );
+    const user = await this.usersService.verifyPassword(loginDto);
 
-    if (hashPassword !== loginDto.password) {
-      throw new BadRequestException('잘못된 인증 정보입니다.');
-    }
-
-    // 토큰 생성해서 반환.
+    return {
+      accessToken: this.getToken({
+        tokenType: 'access',
+        userInfo: {
+          userId: user.id,
+          role: user.role,
+        },
+      }),
+      refreshToken: this.getToken({
+        tokenType: 'refresh',
+        userInfo: {
+          userId: user.id,
+          role: user.role,
+        },
+      }),
+    };
   }
 
   async register(createUserDto: CreateUserDto) {
