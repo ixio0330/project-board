@@ -17,7 +17,7 @@ enum EnumUserUnique {
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [];
+  private usersRepository: User[] = [];
 
   constructor(
     private readonly mailService: MailService,
@@ -54,6 +54,7 @@ export class UsersService {
       salt,
       created_on: getTodayTimestamp(),
     };
+
     this.saveUser(user);
   }
 
@@ -65,15 +66,17 @@ export class UsersService {
       ...updateUserDto,
       updated_on: getTodayTimestamp(),
     };
-    this.users.push(user);
+    this.usersRepository.push(user);
     return user;
   }
 
   // 삭제
   remove(id: string): User[] {
     this.findById(id);
-    this.users = this.users.filter((user) => user.id !== id);
-    return this.users;
+    this.usersRepository = this.usersRepository.filter(
+      (user) => user.id !== id,
+    );
+    return this.usersRepository;
   }
 
   async verifyPassword(loginDto: LoginDto) {
@@ -91,12 +94,12 @@ export class UsersService {
 
   // 전체 조회
   findAll(): User[] {
-    return this.users;
+    return this.usersRepository;
   }
 
   // 특정 조회
   findById(id: string): User {
-    const found = this.users.find((user) => user.id === id);
+    const found = this.usersRepository.find((user) => user.id === id);
     if (!found) {
       throw new BadRequestException('존재하지 않는 사용자입니다.');
     }
@@ -105,7 +108,7 @@ export class UsersService {
 
   // 관리자 체크
   isAdmin(id: string) {
-    const found = this.users.find((user) => user.id === id);
+    const found = this.usersRepository.find((user) => user.id === id);
     if (found.role !== EnumUserRole.admin) {
       throw new BadRequestException('관리자가 아닙니다.');
     }
@@ -113,7 +116,9 @@ export class UsersService {
 
   // 관리자 중복 체크
   adminExistCheck() {
-    const found = this.users.find((user) => user.role === EnumUserRole.admin);
+    const found = this.usersRepository.find(
+      (user) => user.role === EnumUserRole.admin,
+    );
     if (found) {
       throw new BadRequestException('이미 관리자가 존재합니다.');
     }
@@ -121,7 +126,7 @@ export class UsersService {
 
   // 중복 체크
   userExistCheck(type: EnumUserUnique, value: string) {
-    const found = this.users.find((user) => user[type] === value);
+    const found = this.usersRepository.find((user) => user[type] === value);
     if (found) {
       throw new BadRequestException(`이미 존재하는 ${type}입니다.`);
     }
@@ -129,6 +134,6 @@ export class UsersService {
 
   // 추가
   saveUser(user: User) {
-    this.users.push(user);
+    this.usersRepository.push(user);
   }
 }

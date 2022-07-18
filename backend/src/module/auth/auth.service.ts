@@ -3,8 +3,10 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { tokenInfo } from '../../../.env/env';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { User } from '../users/entities/user.entity';
 import { EnumUserRole } from '../users/entities/user.role.entity';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
@@ -19,63 +21,60 @@ interface TokenUserInfo {
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
   private tokenInfo = tokenInfo;
 
   async login(loginDto: LoginDto) {
     const user = await this.usersService.verifyPassword(loginDto);
-
-    return {
-      accessToken: this.getToken({
-        tokenType: 'access',
-        userInfo: {
-          userId: user.id,
-          role: user.role,
-        },
-      }),
-      refreshToken: this.getToken({
-        tokenType: 'refresh',
-        userInfo: {
-          userId: user.id,
-          role: user.role,
-        },
-      }),
-    };
   }
 
   async register(createUserDto: CreateUserDto) {
     return await this.usersService.create(createUserDto);
   }
 
-  private getToken(options: { tokenType: TokenType; userInfo: TokenUserInfo }) {
+  makeTokens(user: User) {
+    return {
+      accessToken: this.getToken('access', user),
+      refreshToken: this.getToken('refresh', user),
+    };
+  }
+
+  private getToken(tokenType: 'access' | 'refresh', user: User) {
+    // User가 아닌 user.id, role만 받으면 됨.
+    const payload = {
+      id: user.id,
+      type: tokenType === 'access' ? 'access' : 'refresh',
+      // role 추가
+    };
+
+    const options: JwtSignOptions = {
+      algorithm: 'HS256',
+      issuer: 'admin',
+      expiresIn: tokenType === 'access' ? 60 : 3600,
+    };
+
+    return this.jwtService.sign(payload, options);
+  }
+
+  verifyRefreshToken(token: string) {
     try {
-      const { tokenType, userInfo } = options;
-      const tokenOptions = {
-        algorithm: this.tokenInfo.JWT_ALG, // 해싱 알고리즘
-        // 토큰 유효 기간
-        expiresIn:
-          tokenType === 'access'
-            ? this.tokenInfo.JWT_ACCESS_EXP // accessToken 시간
-            : this.tokenInfo.JWT_REFRESH_EXP, // refreshToken 시간
-        issuer: this.tokenInfo.JWT_ISSUER, // 발행자
-      };
-      const token = jwt.sign(
-        userInfo,
-        this.tokenInfo.JWT_SECREAT_KEY,
-        tokenOptions,
-      );
-      return token;
+      const result = this.jwtService.verify(token);
+      if (result.type === 'refresh') {
+        // 새로운 토큰 발급해서 반환.
+        // return this.getToken('access');
+      }
+      console.log(result);
     } catch (err) {
-      throw new InternalServerErrorException();
+      console.log('토큰 만료됨');
     }
   }
 
-  private verifyToken(token: string) {
-    try {
-      const payload = jwt.verify(token, process.env.JWT_SECREAT_KEY);
-      return payload;
-    } catch (err) {
-      throw new BadRequestException('유효한 토큰이 아닙니다.');
+  private async verifyPassword(plainPassword: string, hashedPassword: string) {
+    if (plainPassword !== hashedPassword) {
+      throw new BadRequestException('잘못된 인증 정보');
     }
   }
 }
