@@ -8,6 +8,7 @@ import * as uuid from 'uuid';
 import { EnumUserRole } from './entities/user.role.entity';
 import { CryptoService } from '../crypto/crypto.service';
 import { LoginDto } from '../auth/dto/login.dto';
+import { mockData } from '.local/env';
 
 enum EnumUserUnique {
   eamil = '이메일',
@@ -17,7 +18,7 @@ enum EnumUserUnique {
 
 @Injectable()
 export class UsersService {
-  private usersRepository: User[] = [];
+  private usersRepository: User[] = mockData.users;
 
   constructor(
     private readonly mailService: MailService,
@@ -88,6 +89,8 @@ export class UsersService {
     if (hashPassword !== user.password) {
       throw new BadRequestException('잘못된 인증 정보입니다.');
     }
+    user.salt = '';
+    user.password = '';
 
     return user;
   }

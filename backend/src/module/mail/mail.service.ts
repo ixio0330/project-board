@@ -3,7 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { auth, mailBaseUrl } from '../../../.env/env';
+import { auth, mailBaseUrl } from '../../../.local/env';
 import Mail = require('nodemailer/lib/mailer');
 import * as nodemailer from 'nodemailer';
 import { getRandomNumber } from '../../helper/randomNumber';

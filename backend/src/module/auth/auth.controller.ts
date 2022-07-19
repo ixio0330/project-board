@@ -26,6 +26,16 @@ export class AuthController {
     return this.authService.register(createUserDto);
   }
 
+  @Post('/access')
+  verifyAccessToken(@Body() body: { token: string }) {
+    return this.authService.verifyAccessToken(body.token);
+  }
+
+  @Post('/refresh')
+  reissuingToken(@Body() body: { token: string }) {
+    return this.authService.reissuingToken(body.token);
+  }
+
   // @Post('/regist/:authNumber')
   // regist(@Param('authNumber', ParseIntPipe) authNumber: number) {
   //   return this.authService.regist(authNumber);
