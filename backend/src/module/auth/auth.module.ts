@@ -6,7 +6,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { tokenInfo } from '../../../.local/env';
+import { tokenInfo } from '../../../env/env';
 import { JwtStrategy } from './jwt.strategy';
 
 @Module({

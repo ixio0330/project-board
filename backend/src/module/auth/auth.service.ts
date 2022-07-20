@@ -4,13 +4,12 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
-import { tokenInfo } from '../../../.local/env';
+import { tokenInfo } from '../../../env/env';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { User } from '../users/entities/user.entity';
 import { EnumUserRole } from '../users/entities/user.role.entity';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
-const jwt = require('jsonwebtoken');
 
 type TokenType = 'access' | 'refresh';
 
@@ -40,6 +39,34 @@ export class AuthService {
     return await this.usersService.create(createUserDto);
   }
 
+  reissuingToken(token: string) {
+    const user: User = this.verifyRefreshToken(token);
+    return {
+      accessToken: this.getToken('access', user),
+    };
+  }
+
+  verifyAccessToken(token: string) {
+    this.verifyToken(token);
+    return;
+  }
+
+  resetPassword(
+    token: string,
+    body: {
+      oldPassword: string;
+      newPassword: string;
+    },
+  ) {
+    const payload: TokenPayload = this.verifyToken(token);
+    const user = this.usersService.findById(payload.id);
+    return this.usersService.resetPassword(
+      user,
+      body.newPassword,
+      body.oldPassword,
+    );
+  }
+
   private getToken(tokenType: 'access' | 'refresh', user: User) {
     const payload: TokenPayload = {
       id: user.id,
@@ -59,19 +86,7 @@ export class AuthService {
     return this.jwtService.sign(payload, options);
   }
 
-  reissuingToken(token: string) {
-    const user: User = this.verifyRefreshToken(token);
-    return {
-      accessToken: this.getToken('access', user),
-    };
-  }
-
-  verifyAccessToken(token: string) {
-    this.verifyToken(token);
-    return;
-  }
-
-  private verifyToken(token: string) {
+  private verifyToken(token: string): TokenPayload {
     try {
       return this.jwtService.verify(token);
     } catch (err) {

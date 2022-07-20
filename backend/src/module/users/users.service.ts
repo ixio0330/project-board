@@ -8,7 +8,7 @@ import * as uuid from 'uuid';
 import { EnumUserRole } from './entities/user.role.entity';
 import { CryptoService } from '../crypto/crypto.service';
 import { LoginDto } from '../auth/dto/login.dto';
-import { mockData } from '.local/env';
+import { mockData } from 'env/env';
 
 enum EnumUserUnique {
   eamil = '이메일',
@@ -69,6 +69,25 @@ export class UsersService {
     };
     this.usersRepository.push(user);
     return user;
+  }
+
+  updatePassword(user: User) {
+    this.usersRepository = [...this.usersRepository, user];
+    console.log(this.usersRepository);
+  }
+
+  // 비밀번호 리셋
+  // 1. 메일 인증 후 리셋
+  // 2. 기존 비밀번호 확인 후 리셋
+  async resetPassword(user: User, oldPassword: string, newPassword: string) {
+    this.verifyPassword({ id: user.id, password: oldPassword });
+    const { password, salt } = await this.cryptoService.cipher(newPassword);
+    user = {
+      ...user,
+      password,
+      salt,
+    };
+    this.updatePassword(user);
   }
 
   // 삭제

@@ -34,8 +34,9 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# Local
-/.local
+# ENV
+/env
+*.env
 
 # Rest client
 /http

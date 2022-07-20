@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Headers,
   ParseIntPipe,
 } from '@nestjs/common';
 import { CreateUserDto } from '../users/dto/create-user.dto';
@@ -27,13 +28,26 @@ export class AuthController {
   }
 
   @Post('/access')
-  verifyAccessToken(@Body() body: { token: string }) {
-    return this.authService.verifyAccessToken(body.token);
+  verifyAccessToken(@Headers() header: any) {
+    return this.authService.verifyAccessToken(header.authorization);
   }
 
   @Post('/refresh')
-  reissuingToken(@Body() body: { token: string }) {
-    return this.authService.reissuingToken(body.token);
+  reissuingToken(@Headers() header: any) {
+    return this.authService.reissuingToken(header.authorization);
+  }
+
+  @Post('/password')
+  resetPassword(
+    @Headers() header: any,
+    @Body()
+    body: {
+      oldPassword: string;
+      newPassword: string;
+    },
+  ) {
+    console.log(body);
+    return this.authService.resetPassword(header.authorization, body);
   }
 
   // @Post('/regist/:authNumber')
