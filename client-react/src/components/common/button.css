@@ -1,0 +1,55 @@
+#button {
+  all: unset;
+  padding: 7px 15px;
+  margin-left: 5px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+#button.default {
+  background-color: #555;
+}
+
+#button.default.line {
+  border: 1px solid #555;
+  background-color: transparent;
+}
+
+#button.info {
+  background-color: rgba(0, 140, 255, 0.63);
+}
+
+#button.info.line {
+  border: 1px solid rgba(0, 140, 255, 0.63);
+  background-color: transparent;
+}
+
+#button.success {
+  background-color: rgba(0, 255, 13, 0.596);
+  background-color: transparent;
+}
+
+#button.success.line {
+  border: 1px solid rgba(0, 255, 13, 0.596);
+  background-color: transparent;
+}
+
+#button.warn {
+  background-color: rgba(255, 238, 0, 0.63);;
+  background-color: transparent;
+}
+
+#button.warn.line {
+  border: 1px solid rgba(255, 238, 0, 0.63);;
+  background-color: transparent;
+}
+
+#button.error {
+  background-color: rgba(255, 8, 0, 0.63);
+  background-color: transparent;
+}
+
+#button.error.line {
+  border: 1px solid rgba(255, 8, 0, 0.63);
+  background-color: transparent;
+}

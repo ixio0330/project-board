@@ -1,0 +1,17 @@
+@charset "UTF-8";
+
+.home_view {
+  padding: 20px;
+  width: 80vw;
+  margin: 0 auto;
+}
+
+.home_view header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.home_view header h2 {
+  margin-bottom: 30px;
+}

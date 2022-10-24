@@ -1,0 +1,49 @@
+# POST http://localhost:3001/user/register 
+# Content-Type: application/json
+
+# {
+#   "id": "test2",
+#   "name": "tester2",
+#   "password": "test"
+# }
+
+# POST http://localhost:3001/user/login 
+# Content-Type: application/json
+
+# {
+#   "id": "test2",
+#   "password": "test"
+# }
+
+# POST http://localhost:3001/token/verify 
+# Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdCIsImlhdCI6MTY2MzY1ODMxMiwiZXhwIjoxNjYzNzQ0NzEyfQ.GOimmifFDAyOusVOWNqh4Gszx1MrJGXkpTRX9Nv6-Rk
+
+# POST http://localhost:3001/post
+# Content-Type: application/json
+
+# {
+#   "title": "test",
+#   "content": "test"
+# }
+
+# PUT http://localhost:3001/post/1
+# Content-Type: application/json
+
+# {
+#   "title": "test update",
+#   "content": "test update"
+# }
+
+# GET http://localhost:3001/post
+
+# GET http://localhost:3001/test
+
+DELETE http://localhost:3001/post/5d5c6900-3969-11ed-ba19-d1facbe329a9
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdCIsImlhdCI6MTY2MzcyNzk0MSwiZXhwIjoxNjYzODE0MzQxfQ.GdnCUWDe9SPfF93GAHlxI8kzwhiyHLovDRuTsjoE1fI
+# Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdDIiLCJpYXQiOjE2NjM3MzYwNzUsImV4cCI6MTY2MzgyMjQ3NX0.vOA06sISvmTzsh4J6uai0UP4svct9cTASmrcAxqQBMU
+
+{
+  "title": "title",
+  "content": "content"
+}
