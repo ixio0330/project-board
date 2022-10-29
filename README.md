@@ -53,7 +53,7 @@ $ npm i
 $ npm start
 ```
 
-React 어플리케이션은 [http://localhost:3001](http://localhost:3001)에서 실행됩니다.
+React 어플리케이션은 [http://localhost:3000](http://localhost:3000)에서 실행됩니다.
 
 <h4>Client Vue</h4>
 
@@ -65,4 +65,4 @@ $ npm i
 $ npm start
 ```
 
-Vue 어플리케이션은 [http://localhost:3001](http://localhost:3001)에서 실행됩니다.
+Vue 어플리케이션은 [http://localhost:8080](http://localhost:8080)에서 실행됩니다.
