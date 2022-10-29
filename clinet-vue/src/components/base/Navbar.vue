@@ -2,8 +2,8 @@
   <nav>
     <h1>
       <router-link to="/">
-          <i class="fa-solid fa-code"></i>
-          <!-- <span>B-coding</span> -->
+        <i class="fa-solid fa-code"></i>
+        <span>Home</span>
       </router-link>
     </h1>
     <ul class="menu_list" v-if="isLogin">

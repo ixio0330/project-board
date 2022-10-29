@@ -16,7 +16,7 @@ export default function Navbar() {
       <h1>
         <Link to='/'>
           <FaCode color="#eeeeee" />
-          <span>B-coding</span>
+          <span>Home</span>
         </Link>
       </h1>
       {
