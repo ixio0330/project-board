@@ -61,7 +61,7 @@ router.post('/register', async (req, res) => {
 
 async function getById(_id) {
   try {
-    const { rows } = await database.query(`select * from _users where id='${_id}'`);
+    const { rows } = await database.query(`select * from users where id='${_id}'`);
     return rows[0];
   } catch (error) {
     return null;
@@ -70,7 +70,7 @@ async function getById(_id) {
 
 async function create({ id, password, name, salt}) {
   try {
-    await database.query(`insert into _users (id, password, name, salt) values ('${id}', '${password}', '${name}', '${salt}')`);
+    await database.query(`insert into users (id, password, name, salt) values ('${id}', '${password}', '${name}', '${salt}')`);
   } catch (error) {
     throw new Error('사용자 생성 중 오류가 발생했습니다.');
   }

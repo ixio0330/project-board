@@ -10,10 +10,10 @@ const tokenService = require('../jwt');
 router.get('/', async (req, res) => {
   try { 
     const { rows } = await database.query(`
-      select _posts.id, name, title, created_on
-      from _posts
-        inner join _users 
-        on _posts.user_id = _users.id
+      select posts.id, name, title, created_on
+      from posts
+        inner join users 
+        on posts.user_id = users.id
     `); 
     res.send(rows);
   } catch (error) {
@@ -78,11 +78,11 @@ router.delete('/:id', tokenVerify, async (req, res) => {
 async function getById(_id) {
   try {
     const { rows } = await database.query(`
-      select _posts.id, _users.id as user_id, name, title, content, created_on
-      from _posts
-        inner join _users 
-        on _posts.user_id = _users.id
-      where _posts.id = '${_id}'
+      select posts.id, users.id as user_id, name, title, content, created_on
+      from posts
+        inner join users 
+        on posts.user_id = users.id
+      where posts.id = '${_id}'
     `);
     return rows[0];
   } catch (error) {
@@ -92,7 +92,7 @@ async function getById(_id) {
 
 async function create({ user_id, title, content }) {
   try {
-    await database.query(`insert into _posts (id, user_id, title, content, created_on) values ('${uuid.v1()}', '${user_id}', '${title}', '${content}', '${new Date().toISOString()}')`);
+    await database.query(`insert into posts (id, user_id, title, content, created_on) values ('${uuid.v1()}', '${user_id}', '${title}', '${content}', '${new Date().toISOString()}')`);
   } catch (error) {
     throw new Error('글 생성 중 오류가 발생했습니다.');
   }
@@ -107,7 +107,7 @@ async function update({ id, user_id, title, content }) {
     throw new BadRequest('글 생성자만 수정 가능합니다.');
   }
   try {
-    await database.query(`update _posts set title='${title}', content='${content}', where id='${id}'`);
+    await database.query(`update posts set title='${title}', content='${content}', where id='${id}'`);
   } catch (error) {
     throw new Error('글 수정 중 오류가 발생했습니다.');
   }
@@ -122,7 +122,7 @@ async function remove(_id, user_id) {
     throw new BadRequest('글 생성자만 수정 가능합니다.');
   }
   try {
-    await database.query(`delete from _posts where id='${_id}'`);
+    await database.query(`delete from posts where id='${_id}'`);
   } catch (error) {
     throw new Error('글 수정 중 오류가 발생했습니다.');
   }
